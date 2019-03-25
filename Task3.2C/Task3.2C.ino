@@ -6,7 +6,6 @@ Written by: Sarah Ossedryver
 int blue = D0;
 int green = D3;
 int red = D5;
-//int builtIn = D7;
 
 int redState = 0;
 int greenState = 0;
@@ -18,7 +17,6 @@ void setup()
     pinMode(blue, OUTPUT);
     pinMode(green, OUTPUT);
     pinMode(red, OUTPUT);
-    //pinMode(builtIn, OUTPUT);
 
     // Particle.function exposes "toggleLED" to the cloud
     Particle.function("led", toggleLED);
