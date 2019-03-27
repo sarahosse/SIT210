@@ -4,14 +4,14 @@ Written by: Sarah Ossedryver
 */
 
 int TMP36_SENSOR = A4;
-int TransmissionPeriod = 3000; // change this if you want to change the period of publishing
+int TransmissionPeriod = 30000; // change this if you want to change the period of publishing
 
 // function for reading the value and returning the value 
 double getTemp()
 {
     int tempValue = analogRead(TMP36_SENSOR);
-    //return ((tempValue*0.0008 - 0.5) / 0.010);
-    return ((tempValue * 330) / 1024);
+    return ((tempValue - 0.5) / 100.0);
+    
 }
 
 // initialises the sensor
@@ -23,6 +23,6 @@ void setup()
 // continuously loops through this code, publishing the value returned from getTemp
 void loop()
 {
-    Particle.publish("Temp_Reading", String(getTemp()));
+    Particle.publish("Temperature (C)", String(getTemp()), PRIVATE);
     delay(TransmissionPeriod);
 }
