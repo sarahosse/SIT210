@@ -173,6 +173,8 @@ def Z():
 # iterates through the text input and calls the appropriate function for each letter
 def convertToCode():
 	MorseText = textInput.get()
+	if len(MorseText) > 12:
+		return
 	for i in MorseText:
 		if i.upper() == "A":
 			A()
