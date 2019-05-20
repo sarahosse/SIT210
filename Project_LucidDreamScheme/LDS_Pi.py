@@ -4,16 +4,16 @@ import RPi.GPIO as GPIO, sys, urllib2, json, pygame, time, pyaudio, wave, os, ra
 
 # APIs -----------------------------------------------------------------------------------
 
-nightAPI = 'BW2W6IWUHOKX5EKC'
+nightAPI = '############'
 nightURL = 'https://api.thingspeak.com/update?api_key=%s' % nightAPI
 
-dayAPI = 'DKTBQM0C1I7F8P14'
+dayAPI = '############'
 dayURL = 'https://api.thingspeak.com/update?api_key=%s' % dayAPI
 
-movementAPI = '7XTWTUPRR1X6LVDW'
-movementChannel = 783575
+movementAPI = '############'
+movementChannel = ######
 
-ledAPI = '9SR7KSRO33AQP380'
+ledAPI = '############'
 ledURL = 'https://api.thingspeak.com/update?api_key=%s' % ledAPI
 
 # Variables ------------------------------------------------------------------------------
