@@ -5,14 +5,14 @@
 TCPClient client;
 
 // APIs
-unsigned long NightChannel = 783583;
-const char * NightAPI = "M327H552G27A4HSI";
+unsigned long NightChannel = ######;;
+const char * NightAPI = "################";
 
-unsigned long DayChannel = 783772;
-const char * DayAPI = "RZX2M3UOKCQRVE8B";
+unsigned long DayChannel = ######;;
+const char * DayAPI = "################";
 
-unsigned long ledChannel = 783852;
-const char * ledAPI = "BZYFZPYEXU4RDYI6";
+unsigned long ledChannel = ######;
+const char * ledAPI = "################";
 
 // LED pins
 int YELLOW = D0;
