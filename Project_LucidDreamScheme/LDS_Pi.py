@@ -4,24 +4,24 @@ import RPi.GPIO as GPIO, sys, urllib2, json, pygame, time, pyaudio, wave, os, ra
 
 # APIs -----------------------------------------------------------------------------------
 
-nightAPI = '############'
+nightAPI = '################'
 nightURL = 'https://api.thingspeak.com/update?api_key=%s' % nightAPI
 
-dayAPI = '############'
+dayAPI = '################'
 dayURL = 'https://api.thingspeak.com/update?api_key=%s' % dayAPI
 
-movementAPI = '############'
+movementAPI = '################'
 movementChannel = ######
 
-ledAPI = '############'
+ledAPI = '################'
 ledURL = 'https://api.thingspeak.com/update?api_key=%s' % ledAPI
 
 # Variables ------------------------------------------------------------------------------
 
 RED = 23     # stop recording
 GREEN = 24   # start recording
-BLUE = 18    # blue = nighttime
-YELLOW = 12  # yellow = daytime
+BLUE = 18    # nighttime
+YELLOW = 12  # daytime
 
 YellowButtonNotPressed = 1
 dreamNumber = 1
@@ -35,13 +35,14 @@ successfulNight = False
 dayTime = 0
 successfulDay = False
 
-form_1 = pyaudio.paInt16 # 16-bit resolution
-chans = 2 # 1 channel
-samp_rate = 44100 # 44.1kHz sampling rate
-chunk = 1024 # samples for buffer
-dev_index = 2 # device index found by p.get_device_info_by_index(ii)
-filename = 'Dream_'           # start of name of .wav file
+form_1 = pyaudio.paInt16        # 16-bit resolution
+chans = 1                       # 1 channel
+samp_rate = 44100               # 44.1kHz sampling rate
+chunk = 1024                    # samples for buffer
+dev_index = 2                   # device index
+filename = 'Dream_'             # start of name of .wav file
 
+# list of music files to play at random
 Music = ["Bach_Full.wav", "Bach_Prelude.wav", "Experience.wav", "NoRegret.wav", "Winter.wav"]
 
 # Initiations ----------------------------------------------------------------------------
@@ -66,10 +67,10 @@ try:
         # when the blue button is pressed (to signal NIGHT)
         if (GPIO.input(BLUE) == 0):
             print "Sweet dreams ..."
-            nightTime = 1    # data to be sent to ThingSpeak
+            nightTime = 1                    # data to be sent to ThingSpeak
             time.sleep(1)
             
-            # keep trying this for as long as the data hasn't been sent
+            # keep trying this for as long as the data hasn't been sent to ThingSpeak
             while (successfulNight == False):
             
                 # send data to thingSpeak to initiate REM detection
@@ -88,7 +89,7 @@ try:
             while (YellowButtonNotPressed == 1):
             
                 # watches ThingSpeak for notification of REM sleep -----------------------
-            
+                
                 MOVEconnection = urllib2.urlopen("http://api.thingspeak.com/channels/%s/feeds/last.json?api_key=%s" % (movementChannel, movementAPI))
     
                 response = MOVEconnection.read()
@@ -121,10 +122,9 @@ try:
                     # notify thingSpeak it's time for alarm + LEDs
                     LEDconnection = urllib2.urlopen(ledURL + '&field1=%s' % (1))
                     print LEDconnection.read()
-        
-                    # if data sent successfully
-                    #if (LEDconnection.read() > 0):
-                    LEDconnection.close()    # close connection
+                    
+                    # close connection
+                    LEDconnection.close()
                     
                     # allow time for photon to receive message
                     time.sleep(5)
@@ -155,7 +155,9 @@ try:
                             # notify thingSpeak it's time for flashing LEDs
                             LEDconnection = urllib2.urlopen(ledURL + '&field1=%s' % (2))
                             print LEDconnection.read()
-                            LEDconnection.close()    # close connection
+                            
+                            # close connection
+                            LEDconnection.close()
                             
                             time.sleep(5)
                             
@@ -209,18 +211,23 @@ try:
                             print LEDconnection.read()
                             LEDconnection.close()    # close connection
                             
+                            # Recording stops and program waits 10 minutes before again listening for next REM
                             stopRecording = False
                             dreamNumber += 1
+                            time.sleep(600)
                         
-                # Recording stops and program returns to listening for next REM ----------
+                # When yellow button is pushed, the system converts to daytime mode ------
                 YellowButtonNotPressed = GPIO.input(YELLOW)
+                
+            # reset state to unpressed for next time
+            YellowButtonNotPressed = 1
             
         # DAYTIME ------------------------------------------------------------------------
         
         # when the yellow button is pressed (to signal DAY)
         elif (GPIO.input(YELLOW) == 0):
             print "Good moring!"
-            dayTime = 1    # data to be sent to ThingSpeak
+            dayTime = 1                    # data to be sent to ThingSpeak
             time.sleep(1)
             
             # keep trying this for as long as the data hasn't been sent
@@ -233,7 +240,7 @@ try:
                 # if data sent successfully
                 if (YELconnection.read() > 0):
                     YELconnection.close()    # close connection
-                    successfulDay = True    # stop the while loop
+                    successfulDay = True     # stop the while loop
                 
                 time.sleep(1)
         
