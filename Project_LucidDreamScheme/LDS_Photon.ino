@@ -5,10 +5,10 @@
 TCPClient client;
 
 // APIs
-unsigned long NightChannel = ######;;
+unsigned long NightChannel = ######;
 const char * NightAPI = "################";
 
-unsigned long DayChannel = ######;;
+unsigned long DayChannel = ######;
 const char * DayAPI = "################";
 
 unsigned long ledChannel = ######;
@@ -62,6 +62,17 @@ void loop()
     String StartNightTime = ThingSpeak.readCreatedAt(NightChannel, NightAPI);
     String StopNightTime = ThingSpeak.readCreatedAt(DayChannel, DayAPI);
   
+    // uncomment for testing
+    //if (StartNightTime > StopNightTime)
+    //{
+    //    Particle.publish("Daytime or Nighttime", (String) "iiiiiiiit's nighttime!", PRIVATE);
+    //}
+    //else
+    //{
+    //    Particle.publish("Daytime or Nighttime", (String) "Daytime!", PRIVATE);
+    //}
+  
+  
     // ITS NIGHT TIME; LET THE FESTIVITIES COMMENCE!!! ---------------------------------------------
     
     // if night time has been signalled, we can commence meausuring movement
@@ -87,10 +98,10 @@ void loop()
         secondsFromSleepInitiation++;
     
         // wait until at least 3 hrs of sleep has passed
-        if (secondsFromSleepInitiation > 10800)
+        if (secondsFromSleepInitiation > 10800)                                     // comment the if statement out for testing
         {
             // checks how much movement has happened in prior 10 minutes
-            if (secondsFromSleepInitiation % 600 == 0)
+            if (secondsFromSleepInitiation % 600 == 0)                              // change to 60 for testing
             {
                 // calculates percent of movement in previous 10 minutes
                 percentOfMovement = movementCounter/6;
@@ -149,5 +160,5 @@ void loop()
     Particle.publish("Daytime", (String) "I'm listening for a button, maybe?", PRIVATE);
     
     // check every five minutes during the day
-    delay(300000);
+    delay(300000);                                                                      // change to 60000 for testing
 }
