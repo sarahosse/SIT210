@@ -1,48 +1,61 @@
-import time, smbus
+/*
+    by Sarah Ossedryver
+*/
 
-# -- initialisations / variables --------------------------------------
 
-# initialise I2C (System Management Bus, or SMBus)
-i2cChannel = 1
-BUS = smbus.SMBus(i2cChannel)
+int period = 5000;              // change this if you want to change the period of publishing
+const int TMPaddress = 0x48;    // address of TMP102
+const int nBytesToRead = 2;     // there are 2 bytes to be read from TMP102
+char publishString[30];
+int addressSuccess;
 
-# TMP102 is a 7 bit address (left-shifted for read-write bit)
-i2cAddress = 0x48
+void setup()
+{
+    Serial.begin(9600);
+    Wire.begin();               // initialises serial communication library
+}
 
-# 8-bit addresses of memory locations (or, registers)
-TemperatureAddress = 0x00
-ConfigurationAddress = 0x01
 
-# -- function --------------------------------------------------------
-
-# reads temp addresses in memory
-# checks for negative temps (not really necessary in Summer...)
-# calculates Celsius
-def readTemperature():
+void loop()
+{
+    // check if a signal is being received from i2c pins
+    if (Wire.isEnabled())
+    {
+        Particle.publish("TMP102", "wire enabled", PRIVATE);
+        delay(period/5);
+        
+        // master (photon) requests bytes from slave (TMP102)
+        Wire.requestFrom(TMPaddress, nBytesToRead);
+        
+        // ensures 2 bytes are available for reading
+        if (Wire.available() == nBytesToRead)
+        {
+            Particle.publish("TMP102", "wire available", PRIVATE);
+            delay(period/5);
+            byte byte1 = Wire.read();
+            byte byte2 = Wire.read();
+            
+            // removes empty bits from byte 2
+            // combines bytes
+            // converts to temperature (according to TMP102 datasheet)
+            int tempInt = ((( byte1 << 8) | byte2) >> 4) * 0.0625;
+            
+            snprintf(publishString, sizeof(publishString), "The temperature is %d (C)", tempInt);
+            Particle.publish("TMP102", publishString, PRIVATE);
+        }
+        else
+        {
+            Particle.publish("TMP102", "wire not available", PRIVATE);
+            delay(period/5);
+        }
+    }
+    else
+    {
+        Wire.begin();
+        Particle.publish("TMP102", "the problem is with the wire", PRIVATE);
+        delay(period/5);
+    }
     
-    # read two temp registers
-    readValue = BUS.read_i2c_block_data(i2cAddress, TemperatureAddress, 2)
-    
-    # low and high temps
-    temperatureValue = (readValue[0] << 4)  (readValue[1] >> 5)
-    
-    # check if negative, and if so convert to two's complement    
-    if (temperatureValue > 0x7FF):
-        temperatureValue = temperatureValue - 4096
-    
-    # converts to Celcius
-    tempCelcius = temperatureValue * 0.0625
-    
-    return tempCelcius
-
-
-# -- continuously read temps ------------------------------------------
-
-# print temp (to 2 digits) every ten seconds
-while True:
-    
-    temp = readTemperature()
-    
-    print(round(temp, 2), " Celcius")
-    
-    time.sleep(10)
+    // wait a period of time
+    delay(period);
+}
